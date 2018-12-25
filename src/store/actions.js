@@ -5,13 +5,16 @@
 import {
   reqAddress,
   reqShops,
-  reqCategorys
+  reqCategorys,
+  reqUserInfo,
+  reqLogout
 } from '../api'
 
 import {
   RECEIVE_ADDRESS,
   RECEIVE_CATEGORYS,
-  RECEIVE_SHOPS
+  RECEIVE_SHOPS,
+  RECEIVE_USER
 } from './mutation-types'
 
 export default {
@@ -50,4 +53,19 @@ export default {
       commit(RECEIVE_SHOPS, {shops})
     }
   },
+  //同步保存user信息
+  saveUser ({commit}, user) {
+    commit(RECEIVE_USER, {user})
+  },
+  async getShops({commit, state}) {
+    // 1. 发异步ajax请求
+    const {longitude, latitude} = state
+    const result = await reqShops(longitude, latitude)
+    // 2. 有了结果后, 提交mutation
+    if (result.code === 0) {
+      const shops = result.data
+      commit(RECEIVE_SHOPS, {shops})
+    }
+  },
+
 }

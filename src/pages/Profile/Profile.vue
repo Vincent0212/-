@@ -1,18 +1,22 @@
 <template>
   <section class="profile">
     <nav-header title="我的"/>
-    <section class="profile-number" @click="$router.push('/login')">
+    <section class="profile-number" @click="$router.push(user._id ? '/userinfo' : '/login')">
       <a href="javascript:" class="profile-link">
         <div class="profile_image">
           <i class="iconfont icon-person"></i>
         </div>
         <div class="user-info">
-          <p class="user-info-top">登录/注册</p>
-          <p>
-                <span class="user-icon">
-                  <i class="iconfont icon-shouji icon-mobile"></i>
-                </span>
-            <span class="icon-mobile-number">暂无绑定手机号</span>
+          <p class="user-info-top" v-if="!user.phone">
+            {{user.name? user.name : '登录/注册'}}
+          </p>
+          <p >
+            <span class="user-icon">
+              <i class="iconfont icon-shouji icon-mobile"></i>
+            </span>
+            <span class="icon-mobile-number" v-if="!user.name">
+              {{user.phone ? user.phone: '暂无绑定手机号'}}
+            </span>
           </p>
         </div>
         <span class="arrow">
@@ -88,13 +92,39 @@
         </div>
       </a>
     </section>
+
+    <section class="profile_my_order border-1px" v-if="user._id">
+      <mt-button type="danger" style="width: 100%" @click="logout">退出登陆</mt-button>
+    </section>
   </section>
 </template>
 
 <script>
+  import {mapState} from 'vuex'
+  import {MessageBox} from 'mint-ui'
   import NavHeader from "../../components/NavHeader/NavHeader.vue";
+  import MtButton from "../../../node_modules/mint-ui/packages/button/src/button.vue";
 
-  export default {components: {NavHeader}}
+  export default {
+    computed: {
+      ...mapState(['user'])
+    },
+
+    methods: {
+      logout(){
+        MessageBox.confirm('确定退出吗?').then(action => {
+          console.log('----', action)
+          this.$store.dispatch('logout')
+        }).catch(action => {
+          console.log('++++', action)
+        })
+      }
+    },
+
+    components: {
+      MtButton,
+      NavHeader}
+  }
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" scoped>
